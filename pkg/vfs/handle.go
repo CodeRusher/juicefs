@@ -215,15 +215,12 @@ func (v *VFS) findHandle(inode Ino, fh uint64) *handle {
 }
 
 func (v *VFS) releaseHandle(inode Ino, fh uint64) {
+	var released *handle
 	v.hanleM.Lock()
-	defer v.hanleM.Unlock()
 	hs := v.handles[inode]
 	for i, f := range hs {
 		if f.fh == fh {
-			if hs[i].dirHandler != nil {
-				hs[i].dirHandler.Close()
-				hs[i].dirHandler = nil
-			}
+			released = f
 			if i+1 < len(hs) {
 				hs[i] = hs[len(hs)-1]
 			}
@@ -235,6 +232,15 @@ func (v *VFS) releaseHandle(inode Ino, fh uint64) {
 			}
 			break
 		}
+	}
+	v.hanleM.Unlock()
+	if released != nil {
+		released.Lock()
+		if released.dirHandler != nil {
+			released.dirHandler.Close()
+			released.dirHandler = nil
+		}
+		released.Unlock()
 	}
 }
 

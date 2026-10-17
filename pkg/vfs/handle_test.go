@@ -17,8 +17,10 @@
 package vfs
 
 import (
+	"sync"
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/juicedata/juicefs/pkg/meta"
 	"github.com/stretchr/testify/require"
@@ -118,11 +120,18 @@ type blockingDirHandler struct {
 	meta.DirHandler
 	entered chan struct{}
 	resume  chan struct{}
+	closed  chan struct{}
 }
 
 func (d *blockingDirHandler) Insert(Ino, string, *Attr) {
 	close(d.entered)
 	<-d.resume
+}
+
+func (d *blockingDirHandler) Close() {
+	if d.closed != nil {
+		close(d.closed)
+	}
 }
 
 func TestInvalidateDirHandleConcurrentRelease(t *testing.T) {
@@ -142,6 +151,77 @@ func TestInvalidateDirHandleConcurrentRelease(t *testing.T) {
 	v.releaseHandle(ino, second.fh)
 	close(d.resume)
 	require.Nil(t, <-done, "concurrent release must not invalidate the slice being traversed")
+}
+
+type noopDirHandler struct {
+	meta.DirHandler
+}
+
+func (*noopDirHandler) Insert(Ino, string, *Attr) {}
+func (*noopDirHandler) Close()                    {}
+
+func TestInvalidateDirHandleConcurrentClose(t *testing.T) {
+	v := &VFS{handles: make(map[Ino][]*handle), handleIno: make(map[uint64]Ino)}
+	const ino Ino = 2
+	for i := 0; i < 1000; i++ {
+		h := v.newHandle(ino, true, 0)
+		h.dirHandler = &noopDirHandler{}
+		start := make(chan struct{})
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-start
+			v.invalidateDirHandle(ino, "entry", 3, &Attr{})
+		}()
+		close(start)
+		v.releaseHandle(ino, h.fh)
+		wg.Wait()
+	}
+}
+
+func TestReleaseHandleWaitsForDirectoryOperation(t *testing.T) {
+	v := &VFS{handles: make(map[Ino][]*handle), handleIno: make(map[uint64]Ino)}
+	const ino Ino = 2
+	h := v.newHandle(ino, true, 0)
+	d := &blockingDirHandler{entered: make(chan struct{}), resume: make(chan struct{}), closed: make(chan struct{})}
+	h.dirHandler = d
+	updated := make(chan struct{})
+	go func() {
+		v.invalidateDirHandle(ino, "entry", 3, &Attr{})
+		close(updated)
+	}()
+	<-d.entered
+	released := make(chan struct{})
+	go func() {
+		v.releaseHandle(ino, h.fh)
+		close(released)
+	}()
+	detached := make(chan struct{})
+	go func() {
+		for len(v.findAllHandles(ino)) != 0 {
+			time.Sleep(time.Millisecond)
+		}
+		close(detached)
+	}()
+	var blocked, closedEarly bool
+	select {
+	case <-detached:
+	case <-time.After(5 * time.Second):
+		blocked = true
+	}
+	select {
+	case <-d.closed:
+		closedEarly = true
+	default:
+	}
+	close(d.resume)
+	<-updated
+	<-released
+	<-detached
+	require.False(t, blocked, "waiting for a directory operation must not hold the handle registry lock")
+	require.False(t, closedEarly, "directory cache must not close while it is in use")
+	require.Nil(t, h.dirHandler)
 }
 
 func TestTruncateReleasesContexts(t *testing.T) {
