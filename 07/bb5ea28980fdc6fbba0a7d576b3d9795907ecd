@@ -1,0 +1,24 @@
+pkg/vfs/handle_test.go
+  s_bfd79d4841a163::t_4affd8a4530024 23,123,131-136,161,180-211,213-225
+  s_bfd79d4841a163::t_48c17c73800c48 20,156-160,162-179,212
+  s_bfd79d4841a163::t_84b1a3e957eebf 226
+pkg/vfs/handle.go
+  s_bfd79d4841a163::t_94766bcc07ae31 218,223,236-243
+  s_bfd79d4841a163::t_c26b8117132f0b 244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "07bb5ea28980fdc6fbba0a7d576b3d9795907ecd",
+  "prompts": {},
+  "sessions": {
+    "s_bfd79d4841a163": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a147ce-0c4d-7363-8f90-c164f167f085",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "CodeRusher <coderushing@gamil.com>"
+    }
+  }
+}
