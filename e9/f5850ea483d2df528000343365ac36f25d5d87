@@ -1,0 +1,19 @@
+pkg/meta/sql_metrics_test.go
+  s_bfd79d4841a163::t_bba11861fafa1e 29-30,32,35,39,41-42,44-46,48-50,52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e9f5850ea483d2df528000343365ac36f25d5d87",
+  "prompts": {},
+  "sessions": {
+    "s_bfd79d4841a163": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a147ce-0c4d-7363-8f90-c164f167f085",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "CodeRusher <coderushing@gamil.com>"
+    }
+  }
+}
