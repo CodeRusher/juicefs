@@ -1,0 +1,34 @@
+docs/en/reference/p8s_metrics.md
+  s_bfd79d4841a163::t_a17f85ce06e0de 44-61
+docs/zh_cn/reference/p8s_metrics.md
+  s_bfd79d4841a163::t_a17f85ce06e0de 44-61
+pkg/meta/sql.go
+  s_bfd79d4841a163::t_a17f85ce06e0de 44-45,570-574
+  s_e84d72cec92ad8::t_0e82f0c4dc985f 575-576
+pkg/meta/sql_metrics_test.go
+  s_bfd79d4841a163::t_a17f85ce06e0de 1-171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c9052e2827b612c63647f171530991f801b39805",
+  "prompts": {},
+  "sessions": {
+    "s_bfd79d4841a163": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a147ce-0c4d-7363-8f90-c164f167f085",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "CodeRusher <coderushing@gamil.com>"
+    },
+    "s_e84d72cec92ad8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a152fa-3f0e-7331-905c-f029ed416dd5",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "CodeRusher <coderushing@gamil.com>"
+    }
+  }
+}
