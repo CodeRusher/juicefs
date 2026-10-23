@@ -1,0 +1,19 @@
+pkg/meta/sql.go
+  s_bfd79d4841a163::t_f3d777a8246b59 573-575
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cb1511aa6f17bafd7a4f8265a2e50ce2de536f53",
+  "prompts": {},
+  "sessions": {
+    "s_bfd79d4841a163": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a147ce-0c4d-7363-8f90-c164f167f085",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "CodeRusher <coderushing@gamil.com>"
+    }
+  }
+}
